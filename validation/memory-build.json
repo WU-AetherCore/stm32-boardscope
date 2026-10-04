@@ -1,0 +1,26 @@
+{
+  "Debug": {
+    "bss": 45628,
+    "ccm_total": 65536,
+    "ccm_used": 0,
+    "data": 692,
+    "flash_total": 524288,
+    "flash_used": 234304,
+    "ram_total": 131072,
+    "ram_used": 46312,
+    "text": 233604,
+    "dec": 279924
+  },
+  "Release": {
+    "bss": 45604,
+    "ccm_total": 65536,
+    "ccm_used": 0,
+    "data": 284,
+    "flash_total": 524288,
+    "flash_used": 179820,
+    "ram_total": 131072,
+    "ram_used": 45880,
+    "text": 179528,
+    "dec": 225416
+  }
+}

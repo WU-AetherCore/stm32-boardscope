@@ -1,0 +1,33 @@
+name: Firmware and host tests
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ARM GCC and Ninja
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build
+      - name: Host regression tests
+        run: |
+          cmake -S tests -B build/HostTests -G Ninja
+          cmake --build build/HostTests
+          ctest --test-dir build/HostTests --output-on-failure
+      - name: Build firmware
+        run: |
+          cmake --preset Debug
+          cmake --build --preset Debug --parallel 2
+          cmake --preset Release
+          cmake --build --preset Release --parallel 2
+          python3 tools/verify_memory.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: boardscope-firmware
+          path: |
+            build/Debug/*.elf
+            build/Debug/*.hex
+            build/Debug/*.bin
+            build/Release/*.elf
+            build/Release/*.hex
+            build/Release/*.bin

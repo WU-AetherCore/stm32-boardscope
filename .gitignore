@@ -1,0 +1,7 @@
+# 构建缓存与本地工具输出；源码、说明和验证图保留。
+/build/
+/cmake-build-*/
+/.idea/
+/tests/*.exe
+*.log
+__pycache__/
