@@ -1,8 +1,18 @@
 # STM32 BoardScope · 板载状态监测台
 
+[![Build](https://github.com/WU-AetherCore/stm32-boardscope/actions/workflows/build.yml/badge.svg)](https://github.com/WU-AetherCore/stm32-boardscope/actions/workflows/build.yml)
+
 基于 STM32F407VET6、FreeRTOS、KK_UI 与 KK_OLED 的中文板级监控工程。
 旋转编码器操作 OLED，UART1 每秒输出一组状态，配套中文电脑窗口实时查看。
 由 STM32F407VET6-CLion-V1.1 整理，版本 1.1.1。
+
+## UI 预览
+
+以下图片来自已运行板子的 OLED 帧缓冲，用于展示布局。
+
+| 首页 | 串口监测 |
+|---|---|
+| ![首页](docs/images/home.png) | ![串口监测](docs/images/uart.png) |
 
 ## 功能
 
