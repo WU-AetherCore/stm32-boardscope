@@ -26,14 +26,14 @@ void WU_Init(void)
 {
 	LED(1);
 	//BUZZER(1);
-#if !defined(WU_USE_KK_UI)
+#if !defined(WU_USE_ASTRA_UI)
 	OLED_U8G2_Init();
 #endif
 
 	WU_CAN1_Init();
 
 
-#if !defined(WU_USE_KK_UI)
+#if !defined(WU_USE_ASTRA_UI)
 	if(__HAL_RCC_GET_FLAG(RCC_FLAG_IWDGRST) != RESET)
 	{
 		WU_OLED_U8G2_ClearBuffer();
@@ -70,7 +70,7 @@ void WU_Init(void)
 
 
 #else
-    /* KK_UI owns initialization and all display updates in its RTOS task. */
+    /* Astra owns initialization and all display updates in its RTOS task. */
     __HAL_RCC_CLEAR_RESET_FLAGS();
 #endif
 	HAL_TIM_Base_Start_IT(&htim6);//使能定时器6定时中断

@@ -12,14 +12,13 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "cmsis_os.h"
-#include "kk_oled.h"
-#include "kk_ui.h"
+#include "astra_port.h"
 #include <stdio.h>
 #include <string.h>
 extern unsigned char buzzer_flag_dat1, cs_bj_flag_bit;
-extern volatile uint32_t kk_ui_heartbeat, kk_ui_stack_free_words;
-extern volatile OLED_Status kk_ui_oled_status;
-extern volatile KK_UI_Status kk_ui_status;
+extern volatile uint32_t board_ui_heartbeat, board_ui_stack_free_words;
+extern volatile uint32_t board_oled_status;
+extern volatile uint32_t board_ui_status;
 /* 大数组放在静态区，避免消耗通信任务栈。单个快照内数值不再改变。
  * 跨任务状态按字段采样，不宣称是硬件总线同时锁存的原子快照。 */
 static uint32_t values[26][8];
@@ -72,10 +71,10 @@ static void capture(uint32_t now)
     values[6][2] = m.heap_min_free;
     values[6][3] = m.task_count;
     values[6][4] = uxTaskGetStackHighWaterMark(NULL) * sizeof(StackType_t);
-    values[7][0] = kk_ui_oled_status;
-    values[7][1] = kk_ui_status;
-    values[7][2] = kk_ui_heartbeat;
-    values[7][3] = kk_ui_stack_free_words * 4;
+    values[7][0] = board_oled_status;
+    values[7][1] = board_ui_status;
+    values[7][2] = board_ui_heartbeat;
+    values[7][3] = board_ui_stack_free_words * 4;
     for (unsigned i = 0; i < 3; ++i)
     {
         values[8 + i][0] = i + 1;

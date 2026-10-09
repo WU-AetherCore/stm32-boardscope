@@ -158,7 +158,7 @@ void MX_FREERTOS_Init(void) {
   WU_Task03Handle = osThreadCreate(osThread(WU_Task03), NULL);
 
   /* definition and creation of WU_Task04 */
-#if defined(WU_USE_KK_UI)
+#if defined(WU_USE_ASTRA_UI)
   osThreadDef(WU_Task04, OLED_WUStartTask04, osPriorityNormal, 0, 1024);
 #else
   osThreadDef(WU_Task04, OLED_WUStartTask04, osPriorityLow, 0, 128);

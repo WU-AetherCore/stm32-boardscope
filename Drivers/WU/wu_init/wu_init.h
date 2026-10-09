@@ -15,7 +15,7 @@
 #include "../../WU/key/key.h"
 #include "../../WU/wu_main/wu_main.h"
 
-#if !defined(WU_USE_KK_UI)
+#if !defined(WU_USE_ASTRA_UI)
 #include "../../WU/OLED_U8g2/IIC_OLED/UI_OLED.h"
 #endif
 

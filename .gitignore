@@ -5,3 +5,7 @@
 /tests/*.exe
 *.log
 __pycache__/
+
+/backup/
+/validation/*.bin
+/tools/migration/

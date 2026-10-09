@@ -5,7 +5,7 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/arm-none-eabi.cmake"
         CACHE FILEPATH "ARM GCC toolchain")
 endif()
-project(STM32-BoardScope VERSION 1.1.1 LANGUAGES C ASM)
+project(STM32F407VET6-CLion-V1.2 VERSION 1.2.0 LANGUAGES C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
@@ -22,21 +22,19 @@ set(CMAKE_C_FLAGS_RELEASE "-Os -g0")
 file(GLOB_RECURSE FIRMWARE_SOURCES CONFIGURE_DEPENDS
     "Core/Src/*.c" "Drivers/WU/*.c"
     "Drivers/STM32F4xx_HAL_Driver/Src/*.c")
-option(WU_USE_KK_UI "启用 V1.1 板级 UI" ON)
-if(NOT WU_USE_KK_UI)
-    message(FATAL_ERROR "V1.1 的串口和板级诊断依赖 BoardApp；旧 OLED 请使用保留的 V1.0 工程。")
-endif()
-if(WU_USE_KK_UI)
-    # 保留旧 OLED 源码供参考，不参与 V1.1 UI 编译，避免两个显示任务冲突。
-    list(FILTER FIRMWARE_SOURCES EXCLUDE REGEX "/OLED_U8g2/")
-    file(GLOB_RECURSE KK_SOURCES CONFIGURE_DEPENDS
-        "Middlewares/Third_Party/KK_UI/src/*.c"
-        "Middlewares/Third_Party/KK_OLED/graphics/*.c"
-        "Middlewares/Third_Party/KK_OLED/driver/*.c")
-    list(APPEND FIRMWARE_SOURCES ${KK_SOURCES})
-else()
-    list(FILTER FIRMWARE_SOURCES EXCLUDE REGEX "/BoardApp/")
-endif()
+# V1.2 完全停用旧 KK_UI/KK_OLED，旧文件仅保留作迁移参考。
+list(FILTER FIRMWARE_SOURCES EXCLUDE REGEX "/(OLED_U8g2|kk_ui_app|kk_ui_port)/")
+list(FILTER FIRMWARE_SOURCES EXCLUDE REGEX "kk_ui_(app|port)\\.c$")
+set(ASTRA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/Astra")
+file(GLOB_RECURSE ASTRA_SOURCES CONFIGURE_DEPENDS
+    "${ASTRA_DIR}/astra/ui/*.cpp" "${ASTRA_DIR}/hal/hal.cpp"
+    "Drivers/WU/BoardApp/src/*.cpp"
+    "${ASTRA_DIR}/hal/hal_dreamCore/components/oled/graph_lib/u8g2/*.c")
+list(FILTER ASTRA_SOURCES EXCLUDE REGEX "(u8g2_font_myfont|u8x8_fonts)\\.c$")
+list(APPEND FIRMWARE_SOURCES ${ASTRA_SOURCES})
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
+set(CMAKE_CXX_FLAGS_RELEASE "-Os -g0")
 set(FREERTOS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Middlewares/Third_Party/FreeRTOS/Source")
 file(GLOB FREERTOS_SOURCES CONFIGURE_DEPENDS "${FREERTOS_DIR}/*.c")
 add_executable(${PROJECT_NAME}
@@ -46,16 +44,11 @@ add_executable(${PROJECT_NAME}
     ${FREERTOS_DIR}/portable/MemMang/heap_4.c
     Core/Startup/startup_stm32f407vetx.s)
 set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".elf")
-if(WU_USE_KK_UI)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE WU_USE_KK_UI=1
-        KK_UI_REFRESH_MODE=0 INCLUDE_uxTaskGetStackHighWaterMark=1)
-    target_include_directories(${PROJECT_NAME} PRIVATE
-        Middlewares/Third_Party/KK_UI/include
-        Middlewares/Third_Party/KK_OLED/include
-        Middlewares/Third_Party/KK_OLED/graphics
-        Middlewares/Third_Party/KK_OLED/driver
-        Drivers/WU/BoardApp/include)
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE WU_USE_ASTRA_UI=1
+    INCLUDE_uxTaskGetStackHighWaterMark=1)
+target_include_directories(${PROJECT_NAME} PRIVATE
+    Drivers/WU/BoardApp/include "${ASTRA_DIR}"
+    "${ASTRA_DIR}/hal/hal_dreamCore/components/oled/graph_lib/u8g2")
 target_include_directories(${PROJECT_NAME} PRIVATE
     Core/Inc Drivers/STM32F4xx_HAL_Driver/Inc
     Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
@@ -68,6 +61,7 @@ set(MCU_FLAGS -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
 target_compile_options(${PROJECT_NAME} PRIVATE
     ${MCU_FLAGS} --specs=nano.specs
     $<$<COMPILE_LANGUAGE:C>:-ffunction-sections;-fdata-sections;-Wall;-fstack-usage>
+    $<$<COMPILE_LANGUAGE:CXX>:-ffunction-sections;-fdata-sections;-Wall;-fstack-usage;-fno-exceptions;-fno-rtti;-fno-threadsafe-statics>
     $<$<COMPILE_LANGUAGE:ASM>:-x;assembler-with-cpp>)
 set(LINKER_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/STM32F407VETX_FLASH.ld")
 set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY LINK_DEPENDS "${LINKER_SCRIPT}")
@@ -102,3 +96,10 @@ if(STM32_PROGRAMMER_CLI)
         USES_TERMINAL VERBATIM
         COMMENT "Download firmware through ST-Link, verify and reset")
 endif()
+
+# UI 与中断发送走热路径：避免 Debug 的 -O0 导致字模解码和每字节 IRQ 变慢。
+set_source_files_properties(${ASTRA_SOURCES}
+    Drivers/WU/BoardApp/src/astra_display.c
+    Drivers/WU/BoardApp/src/astra_text.c
+    Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c
+    PROPERTIES COMPILE_OPTIONS "-O2")

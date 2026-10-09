@@ -1,26 +1,26 @@
 {
   "Debug": {
-    "bss": 45628,
+    "bss": 96504,
     "ccm_total": 65536,
     "ccm_used": 0,
-    "data": 692,
+    "data": 1060,
     "flash_total": 524288,
-    "flash_used": 234304,
+    "flash_used": 231424,
     "ram_total": 131072,
-    "ram_used": 46312,
-    "text": 233604,
-    "dec": 279924
+    "ram_used": 97552,
+    "text": 230352,
+    "dec": 327916
   },
   "Release": {
-    "bss": 45604,
+    "bss": 96496,
     "ccm_total": 65536,
     "ccm_used": 0,
-    "data": 284,
+    "data": 668,
     "flash_total": 524288,
-    "flash_used": 179820,
+    "flash_used": 193116,
     "ram_total": 131072,
-    "ram_used": 45880,
-    "text": 179528,
-    "dec": 225416
+    "ram_used": 97152,
+    "text": 192440,
+    "dec": 289604
   }
 }

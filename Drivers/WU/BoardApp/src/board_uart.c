@@ -231,7 +231,7 @@ static void command(const char *line)
     int relay, value, delta;
     if (!strcmp(line, "STATUS"))
     {
-        snprintf(out, sizeof out, "V1.1 T=%u H=%u DHT=%u R=%u%u%u%u%u FLASH=%06lX\r\n", Temperature,
+        snprintf(out, sizeof out, "V1.2 T=%u H=%u DHT=%u R=%u%u%u%u%u FLASH=%06lX\r\n", Temperature,
                  Humidity, board_dht_ok, relay1_flag_dat, relay2_flag_dat, relay3_flag_dat,
                  relay4_flag_dat, relay5_flag_dat, (unsigned long)board_flash_id);
     }

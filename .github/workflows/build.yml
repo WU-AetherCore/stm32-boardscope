@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install ARM GCC and Ninja
-        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi ninja-build libstdc++-arm-none-eabi-newlib
       - name: Host regression tests
         run: |
           cmake -S tests -B build/HostTests -G Ninja
